@@ -44,8 +44,8 @@ App = {
     },
 
     loadAccount: async () => {
-        App.accounts = await web3.eth.getAccounts();
-        App.account = await App.accounts[0];
+        let accounts = await web3.eth.getAccounts();
+        App.account = await accounts[0];
     },
 
     //loading all the contracts
@@ -91,6 +91,7 @@ App = {
 
     renderTasks: async () => {
 
+
         //load task from the blockchain
         const taskCount = await App.todoList.taskCount();
         const $taskTemplate = $('.taskTemplate')
@@ -109,7 +110,6 @@ App = {
                 .prop('name', taskId)
                 .prop('checked', taskCompleted)
                 .on('click', App.toggleCompleted)
-
             // Put the task in the correct list
             if (taskCompleted) {
                 $('#completedTaskList').append($newTaskTemplate)
@@ -121,7 +121,19 @@ App = {
             $newTaskTemplate.show()
         }
     },
+    createTask: async () => {
+        App.setLoading(true)
+        const content = $('#newTask').val()
+        await App.todoList.createTask(content, { from: App.account })
+        window.location.reload()
+    },
 
+    toggleCompleted: async (e) => {
+        App.setLoading(true)
+        const taskId = e.target.name
+        await App.todoList.toggleCompleted(taskId, { from: App.account })
+        window.location.reload()
+    },
 }
 
 
