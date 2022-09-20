@@ -1,4 +1,5 @@
-App = {
+App =
+{
     loading: false,
     contracts: {},
 
@@ -102,7 +103,6 @@ App = {
             const taskId = task[0].toNumber()
             const taskContent = task[1]
             const taskCompleted = task[2]
-
             // Create the html for the task
             const $newTaskTemplate = $taskTemplate.clone()
             $newTaskTemplate.find('.content').html(taskContent)
@@ -116,7 +116,6 @@ App = {
             } else {
                 $('#taskList').append($newTaskTemplate)
             }
-
             // Show the task
             $newTaskTemplate.show()
         }
@@ -135,8 +134,6 @@ App = {
         window.location.reload()
     },
 }
-
-
 $(() => {
     $(window).load(() => {
         App.load()
