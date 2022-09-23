@@ -66,9 +66,9 @@ App =
         }
 
         App.setLoading(true)
+
         //render account
         $('#account').html(App.account)
-
         //render tasks
         await App.renderTasks()
 

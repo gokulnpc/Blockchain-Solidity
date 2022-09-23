@@ -6,6 +6,8 @@ pragma solidity >=0.4.22 <0.9.0;
 
 contract NPCToken 
 {
+    //maximum number of npc token for sale
+    //we shoud tell the public what is the total supply so it should be public
     uint256 public totalSupply;
     string public name = "NPC Token";
     string public symbol = "NPC";
@@ -23,15 +25,18 @@ contract NPCToken
         uint256 _value
     );
 
+    //mapping address to no of npcTokens
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
+    //total of 1 million tokens will be mapped to owner
     constructor (uint256 _initialSupply) public {
         balanceOf[msg.sender] = _initialSupply;
         totalSupply = _initialSupply;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
+        //here msg.address is tokenSaleContract address
         require(balanceOf[msg.sender] >= _value);
 
         balanceOf[msg.sender] -= _value;
