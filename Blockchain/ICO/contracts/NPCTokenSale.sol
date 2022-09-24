@@ -9,16 +9,9 @@ contract NPCTokenSale
     address admin;
     NPCToken public tokenContract;
     uint256 public tokenPrice;
+
+    //to tell user how many got sold
     uint256 public tokensSold;
-    constructor(NPCToken _tokenContract,uint256 _tokenPrice) public
-    {
-        //assign a admin
-        //Token contract
-        //token price
-        admin = msg.sender;
-        tokenContract = _tokenContract;
-        tokenPrice = _tokenPrice;
-    }
 
     event Sell
     (
@@ -29,6 +22,20 @@ contract NPCTokenSale
     function multiply(uint x, uint y) internal pure returns(uint z)
     {
         require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
+    }
+
+    //it is called by admin
+    //admin sets token price
+    //admin gives npcToken instance
+    //admin is admin
+    constructor(NPCToken _tokenContract,uint256 _tokenPrice) public
+    {
+        //assign a admin
+        //Token contract
+        //token price
+        admin = msg.sender;
+        tokenContract = _tokenContract;
+        tokenPrice = _tokenPrice;
     }
 
     function buyTokens(uint256 _numberOfTokens) public payable {
@@ -42,6 +49,7 @@ contract NPCTokenSale
 
         //provision tokens
         //require that transfer is successful
+        //transfer function is invoked by 
         require(tokenContract.transfer(msg.sender, _numberOfTokens));
 
         tokensSold += _numberOfTokens;
@@ -49,7 +57,9 @@ contract NPCTokenSale
         emit Sell(msg.sender, _numberOfTokens);
     }
 
+    //end sale -> it can only b
     function endSale() public {
+        //only admin can call this function
         require(msg.sender == admin);
         require(tokenContract.transfer(admin, tokenContract.balanceOf(address(this))));
 

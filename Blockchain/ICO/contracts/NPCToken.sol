@@ -27,26 +27,33 @@ contract NPCToken
 
     //mapping address to no of npcTokens
     mapping(address => uint256) public balanceOf;
+
+    //to map allowance alloted
     mapping(address => mapping(address => uint256)) public allowance;
 
-    //total of 1 million tokens will be mapped to owner
+    //total of 1 million tokens will be mapped to admin
+    //admin will determine initial number of coins
     constructor (uint256 _initialSupply) public {
         balanceOf[msg.sender] = _initialSupply;
         totalSupply = _initialSupply;
     }
 
+    //it is called by user to send tokens to another user
+    //it is called by contract to send tokens to user
+    //it is called by admin to send tokens to smart contract
+    //hers msg.sender is user
     function transfer(address _to, uint256 _value) public returns (bool success) {
         //here msg.address is tokenSaleContract address
         require(balanceOf[msg.sender] >= _value);
 
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
-
+        
         emit Transfer(msg.sender, _to, _value);
-
         return true;
     }
 
+    //it is called by user to specify the allowance for spender from his account
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
 
@@ -55,6 +62,7 @@ contract NPCToken
         return true;
     }
 
+    //it is called by spender 
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= balanceOf[_from]);
         require(_value <= allowance[_from][msg.sender]);

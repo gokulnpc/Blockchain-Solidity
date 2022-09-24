@@ -1,0 +1,28 @@
+{
+  "name": "npc-token-sale",
+  "version": "1.0.0",
+  "description": "Blockchain ICO",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && sexit 1"
+  },
+  "author": "gokul",
+  "license": "ISC",
+  "devDependencies": {
+    "bootstrap": "^4.6.2",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "lite-server": "^2.3.0",
+    "nodemon": "^2.0.20",
+    "truffle": "^5.5.30",
+    "truffle-contract": "^4.0.2"
+  },
+  "dependencies": {
+    "@truffle/contract": "^4.6.2"
+  }
+}
