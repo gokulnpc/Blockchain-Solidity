@@ -3,13 +3,12 @@ App =
     loading: false,
     contracts: {},
     load: async () => {
-        console.log("App.load()")
         await App.loadWeb3()
         await App.loadAccount()
         await App.loadContract()
-        //await App.render()
+        await App.render()
     },
-    // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
+    //https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
     //loading web3
     loadWeb3: async () => {
         if (typeof web3 !== 'undefined') {
@@ -47,7 +46,6 @@ App =
     loadAccount: async () => {
         let accounts = await web3.eth.getAccounts();
         App.account = await accounts[0];
-        // console.log(App.account);
     },
 
     //loading all the contracts
@@ -61,23 +59,6 @@ App =
         App.contracts.NPCTokenSale.setProvider(App.web3Provider);
         App.npcToken = await App.contracts.NPCToken.deployed();
         App.npcTokenSale = await App.contracts.NPCTokenSale.deployed();
-        console.log(npcToken.address);
-    },
-
-    render: async () => {
-        //to prevent double rendering
-        if (App.loading) {
-            return
-        }
-
-        App.setLoading(true)
-
-        //render account
-        $('#account').html(App.account)
-        //render tasks
-        await App.renderTasks()
-
-        App.setLoading(false)
     },
 
     setLoading: (boolean) => {
@@ -95,49 +76,45 @@ App =
         }
     },
 
+    render: async () => {
+        //to prevent double rendering
+        if (App.loading) {
+            return
+        }
+
+        App.setLoading(true)
+
+        //$('#account').html(App.account)
+
+        //render 
+        await App.renderTasks()
+
+        App.setLoading(false)
+    },
+
     renderTasks: async () => {
 
+        //load token price
+        const price = await App.npcTokenSale.tokenPrice();
+        const npcBalance = await App.npcToken.balanceOf(App.account);
+        const tokensSold = await App.npcTokenSale.tokensSold();
+        const tokensAvailable = await App.npcToken.totalSupply();
 
-        //load task from the blockchain
-        const taskCount = await App.todoList.taskCount();
-        const $taskTemplate = $('.taskTemplate')
+        // console.log(App.account);
+        // console.log(price.toNumber());
+        // console.log(npcBalance.toNumber());
 
-        //render out each task with new task template
-        for (var i = 1; i <= taskCount; i++) {
-            const task = await App.todoList.tasks(i)
-            const taskId = task[0].toNumber()
-            const taskContent = task[1]
-            const taskCompleted = task[2]
-            // Create the html for the task
-            const $newTaskTemplate = $taskTemplate.clone()
-            $newTaskTemplate.find('.content').html(taskContent)
-            $newTaskTemplate.find('input')
-                .prop('name', taskId)
-                .prop('checked', taskCompleted)
-                .on('click', App.toggleCompleted)
-            // Put the task in the correct list
-            if (taskCompleted) {
-                $('#completedTaskList').append($newTaskTemplate)
-            } else {
-                $('#taskList').append($newTaskTemplate)
-            }
-            // Show the task
-            $newTaskTemplate.show()
-        }
+        $('.token-price').html(price.toNumber());
+        $('.npc-balance').html(npcBalance.toNumber());
+        $('.tokens-sold').html(tokensSold.toNumber());
+        $('.tokens-available').html(tokensAvailable.toNumber());
     },
-    createTask: async () => {
-        App.setLoading(true)
-        const content = $('#newTask').val()
-        await App.todoList.createTask(content, { from: App.account })
+
+    buyTokens: async () => {
+        const numberOfTokens = $('#numberOfTokens').val();
+        await App.npcTokenSale.buyTokens(numberOfTokens, { from: App.account });
         window.location.reload()
-    },
-
-    toggleCompleted: async (e) => {
-        App.setLoading(true)
-        const taskId = e.target.name
-        await App.todoList.toggleCompleted(taskId, { from: App.account })
-        window.location.reload()
-    },
+    }
 }
 
 $(() => {

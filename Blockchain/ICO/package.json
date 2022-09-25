@@ -20,9 +20,7 @@
     "lite-server": "^2.3.0",
     "nodemon": "^2.0.20",
     "truffle": "^5.5.30",
-    "truffle-contract": "^4.0.2"
-  },
-  "dependencies": {
+    "truffle-contract": "^4.0.2",
     "@truffle/contract": "^4.6.2"
   }
 }
