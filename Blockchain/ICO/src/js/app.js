@@ -1,5 +1,10 @@
 App =
 {
+    web3Provider: null,
+    account: 0x0,
+    tokenSold: 0,
+    tokensAvailable: 750000,
+    tokenPrice: 1000000000000000,
     loading: false,
     contracts: {},
     load: async () => {
@@ -46,6 +51,7 @@ App =
     loadAccount: async () => {
         let accounts = await web3.eth.getAccounts();
         App.account = await accounts[0];
+        $('#accountAddress').html("Your account: " + App.account);
     },
 
     //loading all the contracts
@@ -95,24 +101,27 @@ App =
     renderTasks: async () => {
 
         //load token price
-        const price = await App.npcTokenSale.tokenPrice();
+        App.tokenPrice = await App.npcTokenSale.tokenPrice();
         const npcBalance = await App.npcToken.balanceOf(App.account);
-        const tokensSold = await App.npcTokenSale.tokensSold();
-        const tokensAvailable = await App.npcToken.totalSupply();
+        App.tokensSold = await App.npcTokenSale.tokensSold();
 
         // console.log(App.account);
         // console.log(price.toNumber());
         // console.log(npcBalance.toNumber());
 
-        $('.token-price').html(price.toNumber());
+        $('.token-price').html(App.tokenPrice.toNumber() / 1000000000000000000);
         $('.npc-balance').html(npcBalance.toNumber());
-        $('.tokens-sold').html(tokensSold.toNumber());
-        $('.tokens-available').html(tokensAvailable.toNumber());
+        $('.tokens-sold').html(App.tokensSold.toNumber());
+        $('.tokens-available').html(App.tokensAvailable);
+
+        var progressPercent = (App.tokensSold.toNumber() / App.tokensAvailable) * 100;
+        $('#progress').css('width', progressPercent + "%");
     },
 
     buyTokens: async () => {
         const numberOfTokens = $('#numberOfTokens').val();
-        await App.npcTokenSale.buyTokens(numberOfTokens, { from: App.account });
+        await App.npcTokenSale.buyTokens(numberOfTokens, { from: App.account, value: App.tokenPrice * numberOfTokens, gas: 500000 });
+        $('form').trigger('reset');
         window.location.reload()
     }
 }
@@ -122,3 +131,7 @@ $(() => {
         App.load()
     })
 });
+
+//note
+// ganache first account deployed the contract so it will hold all 1 million tokens
+// and it will be admin
