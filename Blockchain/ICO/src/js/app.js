@@ -120,10 +120,16 @@ App =
 
     buyTokens: async () => {
         const numberOfTokens = $('#numberOfTokens').val();
-        await App.npcTokenSale.buyTokens(numberOfTokens, { from: App.account, value: App.tokenPrice * numberOfTokens, gas: 500000 });
+        console.log(App.account);
+        await App.npcTokenSale.buyTokens(numberOfTokens, {
+            from: App.account,
+            value: numberOfTokens * App.tokenPrice,
+            gas: 500000 // Gas limit
+        });
         $('form').trigger('reset');
         window.location.reload()
-    }
+    },
+
 }
 
 $(() => {
