@@ -24,34 +24,33 @@ contract Election
     mapping(address => bool ) public voters;
 
     constructor() public {
-        admin = msg.sender;
         addCandidate("Candidate 1");
         addCandidate("Candidate 2");
     }
 
-    event createCandidate
-    (
-        uint id,
-        string name,
-        uint count
+    event votedEvent (
+        uint indexed _candidateId
     );
 
-    function vote(uint _id) public {
-        //valid voter
+    function vote (uint _candidateId) public {
+        // require that they haven't voted before
         require(voters[msg.sender] != true);
 
-        //valid candidate
-        require(_id>0 && _id<=candidateCount);
-        candidates[_id].count +=1;
+        // require a valid candidate
+        require(_candidateId > 0 && _candidateId <= candidateCount);
+
+        // record that voter has voted
         voters[msg.sender] = true;
+
+        // update candidate vote Count
+        candidates[_candidateId].count ++;
+
+        // trigger voted event
+        //emit votedEvent(_candidateId);
     }
 
-    function addCandidate(string memory _name) private {
-        require(msg.sender == admin);
-        candidateCount++;
-        candidates[candidateCount] = Candidate(candidateCount,_name,0);
-        emit createCandidate(candidateCount,_name,0);
-
-    }
-    
+    function addCandidate (string memory _name) private {
+        candidateCount ++;
+        candidates[candidateCount] = Candidate(candidateCount, _name, 0);
+    }   
 }

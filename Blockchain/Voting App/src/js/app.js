@@ -102,6 +102,13 @@ App =
         var candidatesSelect = $('#candidatesSelect');
         candidatesSelect.empty();
 
+        App.Election.voters(App.account).then(function (check) {
+            if (check == true) {
+                $("form").hide();
+                $('#success').show();
+            }
+        });
+
         for (var i = 1; i <= App.candidatesCount; i++) {
             App.Election.candidates(i).then(function (candidate) {
                 var id = candidate[0].toNumber();
@@ -114,22 +121,21 @@ App =
 
                 // Render candidate ballot option
                 var candidateOption = "<option value='" + id + "' >" + name + "</ option>"
-                console.log(id);
                 candidatesSelect.append(candidateOption);
             });
         }
 
+
+
     },
 
     castVote: async () => {
-        var candidateId = $('#candidateSelect:selected').attr("value")
-        console.log(candidateId);
+        var candidateId = $('#candidatesSelect').val()
         App.contracts.Election.deployed().then(function (instance) {
-            return instance.vote(1, { from: App.account });
+            return instance.vote(candidateId, { from: App.account });
         }).then(function (result) {
             // Wait for votes to update
-            $("#content").hide();
-            $("#loader").show();
+            window.location.reload();
         }).catch(function (err) {
             console.error(err);
         });
