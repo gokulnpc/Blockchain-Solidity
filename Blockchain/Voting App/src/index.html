@@ -11,46 +11,44 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
-<body class="bg">
-    <div class="container" style="width: 650px;color: white;">
-
+<body>
+    <div class="container" style="width: 650px">
         <div class="row">
-
             <div class="col-lg-12">
+                <br />
                 <br />
                 <h1 class="text-center">Election Results</h1>
                 <hr />
                 <br />
-            </div>
-
-            <div id="loader">
-                <p class="text-center">Loading...</p>
-            </div>
-
-            <div id="content" class="text-center" style="display: none;">
-                <p>
-                    Introducing NPC Token (NPC)!!
-                    Token price is <span class="token-price"></span>&nbsp;Ether.
-                    You currently have <span class="npc-balance"></span>&nbsp;NPC
-                </p>
-                <br />
-                <form role="form">
-                    <div class="form-group">
-                        <div class="input-group mb-3">
-                            <input type="number" class="form-control" id="numberOfTokens" name="number" value="1"
-                                min="1" pattern="[0-9]" placeholder="No of Tokens" aria-label="Recipient's username"
-                                aria-describedby="button-addon2">
-                            <button class="btn btn-primary" type="button" id="button-addon2"
-                                onclick="App.buyTokens(); return false;">Buy Tokens</button>
+                <div id="loader">
+                    <p class="text-center">Loading...</p>
+                </div>
+                <div id="content" style="display: none;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Votes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="candidatesResults">
+                        </tbody>
+                    </table>
+                    <form onSubmit="App.castVote(); return false;">
+                        <div class="form-group">
+                            <label for="candidatesSelect">Select Candidate</label>
+                            <select class="form-control" id="candidatesSelect">
+                            </select>
                         </div>
-                    </div>
-                </form>
-                <br />
-                <hr />
-                <p id="accountAddress"></p>
+                        <br />
+                        <button type="submit" class="btn btn-primary">Vote</button>
+                        <hr />
+                    </form>
+                    <p id="accountAddress" class="text-center"></p>
+                </div>
             </div>
         </div>
-
     </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>

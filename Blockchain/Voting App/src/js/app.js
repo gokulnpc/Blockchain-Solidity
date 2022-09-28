@@ -2,11 +2,9 @@ App =
 {
     web3Provider: null,
     account: 0x0,
-    tokenSold: 0,
-    tokensAvailable: 750000,
-    tokenPrice: 1000000000000000,
     loading: false,
     contracts: {},
+
     load: async () => {
         await App.loadWeb3()
         await App.loadAccount()
@@ -57,14 +55,10 @@ App =
     //loading all the contracts
     loadContract: async () => {
         //create a Javascript version of a contract
-        const NPCToken = await $.getJSON('NPCToken.json');
-        const NPCTokenSale = await $.getJSON('NPCTokenSale.json');
-        App.contracts.NPCToken = TruffleContract(NPCToken);
-        App.contracts.NPCTokenSale = TruffleContract(NPCTokenSale);
-        App.contracts.NPCToken.setProvider(App.web3Provider);
-        App.contracts.NPCTokenSale.setProvider(App.web3Provider);
-        App.npcToken = await App.contracts.NPCToken.deployed();
-        App.npcTokenSale = await App.contracts.NPCTokenSale.deployed();
+        const Election = await $.getJSON('Election.json');
+        App.contracts.Election = TruffleContract(Election);
+        App.contracts.Election.setProvider(App.web3Provider);
+        App.Election = await App.contracts.Election.deployed();
     },
 
     setLoading: (boolean) => {
@@ -90,8 +84,6 @@ App =
 
         App.setLoading(true)
 
-        //$('#account').html(App.account)
-
         //render 
         await App.renderTasks()
 
@@ -101,35 +93,47 @@ App =
     renderTasks: async () => {
 
         //load token price
-        App.tokenPrice = await App.npcTokenSale.tokenPrice();
-        const npcBalance = await App.npcToken.balanceOf(App.account);
-        App.tokensSold = await App.npcTokenSale.tokensSold();
+        App.candidatesCount = await App.Election.candidateCount();
+        // console.log(App.candidateCount.toNumber());
 
-        // console.log(App.account);
-        // console.log(price.toNumber());
-        // console.log(npcBalance.toNumber());
+        var candidatesResults = $("#candidatesResults");
+        candidatesResults.empty();
 
-        $('.token-price').html(App.tokenPrice.toNumber() / 1000000000000000000);
-        $('.npc-balance').html(npcBalance.toNumber());
-        $('.tokens-sold').html(App.tokensSold.toNumber());
-        $('.tokens-available').html(App.tokensAvailable);
+        var candidatesSelect = $('#candidatesSelect');
+        candidatesSelect.empty();
 
-        var progressPercent = (App.tokensSold.toNumber() / App.tokensAvailable) * 100;
-        $('#progress').css('width', progressPercent + "%");
+        for (var i = 1; i <= App.candidatesCount; i++) {
+            App.Election.candidates(i).then(function (candidate) {
+                var id = candidate[0].toNumber();
+                var name = candidate[1];
+                var voteCount = candidate[2];
+
+                // Render candidate Result
+                var candidateTemplate = "<tr><th>" + id + "</th><td>" + name + "</td><td>" + voteCount + "</td></tr>"
+                candidatesResults.append(candidateTemplate);
+
+                // Render candidate ballot option
+                var candidateOption = "<option value='" + id + "' >" + name + "</ option>"
+                console.log(id);
+                candidatesSelect.append(candidateOption);
+            });
+        }
+
     },
 
-    buyTokens: async () => {
-        const numberOfTokens = $('#numberOfTokens').val();
-        console.log(App.account);
-        await App.npcTokenSale.buyTokens(numberOfTokens, {
-            from: App.account,
-            value: numberOfTokens * App.tokenPrice,
-            gas: 500000 // Gas limit
+    castVote: async () => {
+        var candidateId = $('#candidateSelect:selected').attr("value")
+        console.log(candidateId);
+        App.contracts.Election.deployed().then(function (instance) {
+            return instance.vote(1, { from: App.account });
+        }).then(function (result) {
+            // Wait for votes to update
+            $("#content").hide();
+            $("#loader").show();
+        }).catch(function (err) {
+            console.error(err);
         });
-        $('form').trigger('reset');
-        window.location.reload()
-    },
-
+    }
 }
 
 $(() => {
@@ -138,6 +142,3 @@ $(() => {
     })
 });
 
-//note
-// ganache first account deployed the contract so it will hold all 1 million tokens
-// and it will be admin
