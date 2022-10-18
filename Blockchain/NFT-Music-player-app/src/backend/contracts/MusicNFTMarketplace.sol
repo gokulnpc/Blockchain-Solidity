@@ -51,12 +51,19 @@ contract MusicNFTMarketplace is ERC721("npcToken","NPC"), Ownable
         }
     }
 
-    function buyNFT(uint256 _tokenId) public payable
+    //payable means it will be paid to contract
+    function buyToken(uint256 _tokenId) external payable
     {
-        require(_tokenId < marketItems.length,"not correct token id");
-        uint256 _amount = msg.value;
-        require(_amount == marketItems[_tokenId].price,"values should match");
+        uint256 price  = marketItems[_tokenId].price;
+        address seller = marketItems[_tokenId].seller;
+        require(msg.value == price,"values should match");
+    }
 
+    //to update royalty fee which can be done only by owner or artist
+    //onlyOwner from Ownable contract
+    function updateRoyaltyFee(uint256 _royaltyFee) external onlyOwner
+    {
+        royaltyFee = _royaltyFee;
     }
 
 

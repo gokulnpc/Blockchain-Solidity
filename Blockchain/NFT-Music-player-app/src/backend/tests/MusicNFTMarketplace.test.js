@@ -25,6 +25,7 @@ describe("MusicNFTMarketplace", function () {
             { value: deploymentFees }
         );
 
+
     });
 
     describe("Deployment", function () {
@@ -39,33 +40,33 @@ describe("MusicNFTMarketplace", function () {
             expect(await nftMarketplace.artist()).to.equal(artist.address);
         });
 
-        it("Should mint then list all the music nfts", async function () {
-            expect(await nftMarketplace.balanceOf(nftMarketplace.address)).to.equal(3);
-            // Get each item from the marketItems array then check fields to ensure they are correct
-            await Promise.all(prices.map(async (i, indx) => {
-                const item = await nftMarketplace.marketItems(indx)
-                expect(item.tokenId).to.equal(indx)
-                expect(item.seller).to.equal(deployer.address)
-                expect(item.price).to.equal(i)
-            }))
-        });
+        // it("Should mint then list all the music nfts", async function () {
+        //     expect(await nftMarketplace.balanceOf(nftMarketplace.address)).to.equal(3);
+        //     // Get each item from the marketItems array then check fields to ensure they are correct
+        //     await Promise.all(prices.map(async (i, indx) => {
+        //         const item = await nftMarketplace.marketItems(indx)
+        //         expect(item.tokenId).to.equal(indx)
+        //         expect(item.seller).to.equal(deployer.address)
+        //         expect(item.price).to.equal(i)
+        //     }))
+        // });
         it("Ether balance should equal deployment fees", async function () {
             expect(await ethers.provider.getBalance(nftMarketplace.address)).to.equal(deploymentFees)
         });
 
     });
-    // describe("Updating royalty fee", function () {
+    describe("Updating royalty fee", function () {
 
-    //     it("Only deployer should be able to update royalty fee", async function () {
-    //         const fee = toWei(0.02)
-    //         await nftMarketplace.updateRoyaltyFee(fee)
-    //         await expect(
-    //             nftMarketplace.connect(user1).updateRoyaltyFee(fee)
-    //         ).to.be.revertedWith("Ownable: caller is not the owner");
-    //         expect(await nftMarketplace.royaltyFee()).to.equal(fee)
-    //     });
+        it("Only deployer should be able to update royalty fee", async function () {
+            const fee = toWei(0.02)
+            await nftMarketplace.updateRoyaltyFee(fee)
+            await expect(
+                nftMarketplace.connect(user1).updateRoyaltyFee(fee)
+            ).to.be.revertedWith("Ownable: caller is not the owner");
+            expect(await nftMarketplace.royaltyFee()).to.equal(fee)
+        });
 
-    // });
+    });
     // describe("Buying tokens", function () {
     //     it("Should update seller to zero address, transfer NFT, pay seller, pay royalty to artist and emit a MarketItemBought event", async function () {
     //         const deployerInitalEthBal = await deployer.getBalance()
