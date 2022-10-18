@@ -84,7 +84,7 @@ App =
 
         App.setLoading(true)
 
-        //render 
+        //render
         await App.renderTasks()
 
         App.setLoading(false)
@@ -147,4 +147,3 @@ $(() => {
         App.load()
     })
 });
-
