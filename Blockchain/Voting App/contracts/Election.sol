@@ -46,7 +46,7 @@ contract Election
         candidates[_candidateId].count ++;
 
         // trigger voted event
-        //emit votedEvent(_candidateId);
+        emit votedEvent(_candidateId);
     }
 
     function addCandidate (string memory _name) private {

@@ -1,48 +1,104 @@
+import {
+  Link,
+  BrowserRouter,
+  Routes,
+  Route
+} from "react-router-dom";
+import { useState } from 'react'
+import { ethers } from "ethers"
 
-import logo from './logo.png';
+import MusicNFTMarketplaceAbi from '../contractsData/MusicNFTMarketplace.json'
+import MusicNFTMarketplaceAddress from '../contractsData/MusicNFTMarketplace-address.json'
+
+import { Spinner, Navbar, Nav, Button, Container } from 'react-bootstrap'
+import logo from './logo.png'
+import Home from './Home.js'
+import MyTokens from './MyTokens.js'
+import MyResales from './MyResales.js'
+
 import './App.css';
- 
+
 function App() {
+  const [loading, setLoading] = useState(true)
+  const [account, setAccount] = useState(null)
+  const [contract, setContract] = useState({})
+
+  const web3Handler = async () => {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    setAccount(accounts[0])
+    // Get provider from Metamask
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    // Get signer
+    const signer = provider.getSigner()
+    loadContract(signer)
+  }
+
+  const loadContract = async (signer) => {
+    // Get deployed copy of music nft marketplace contract
+    const contract = new ethers.Contract(MusicNFTMarketplaceAddress.address, MusicNFTMarketplaceAbi.abi, signer)
+    setContract(contract)
+    setLoading(false)
+  }
   return (
-    <div>
-      <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a
-          className="navbar-brand col-sm-3 col-md-2 ms-3"
-          href="http://www.dappuniversity.com/bootcamp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Dapp University
-        </a>
-      </nav>
-      <div className="container-fluid mt-5">
-        <div className="row">
-          <main role="main" className="col-lg-12 d-flex text-center">
-            <div className="content mx-auto mt-5">
-              <a
-                href="http://www.dappuniversity.com/bootcamp"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img src={logo} className="App-logo" alt="logo"/>
-              </a>
-              <h1 className= "mt-5">Dapp University Starter Kit</h1>
-              <p>
-                Edit <code>src/frontend/components/App.js</code> and save to reload.
-              </p>
-              <a
-                className="App-link"
-                href="http://www.dappuniversity.com/bootcamp"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                LEARN BLOCKCHAIN <u><b>NOW! </b></u>
-              </a>
+    <BrowserRouter>
+      <div className="App">
+        <>
+          <Navbar expand="lg" bg="secondary" variant="dark">
+            <Container>
+              <Navbar.Brand href="http://www.dappuniversity.com/bootcamp">
+                <img src={logo} width="40" height="40" className="" alt="" />
+                &nbsp; Music NFT player
+              </Navbar.Brand>
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav className="me-auto">
+                  <Nav.Link as={Link} to="/">Home</Nav.Link>
+                  <Nav.Link as={Link} to="/my-tokens">My Tokens</Nav.Link>
+                  <Nav.Link as={Link} to="/my-resales">My Resales</Nav.Link>
+                </Nav>
+                <Nav>
+                  {account ? (
+                    <Nav.Link
+                      href={`https://etherscan.io/address/${account}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="button nav-button btn-sm mx-4">
+                      <Button variant="outline-light">
+                        {account.slice(0, 5) + '...' + account.slice(38, 42)}
+                      </Button>
+
+                    </Nav.Link>
+                  ) : (
+                    <Button onClick={web3Handler} variant="outline-light">Connect Wallet</Button>
+                  )}
+                </Nav>
+              </Navbar.Collapse>
+            </Container>
+          </Navbar>
+        </>
+        <div>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+              <Spinner animation="border" style={{ display: 'flex' }} />
+              <p className='mx-3 my-0'>Awaiting Metamask Connection...</p>
             </div>
-          </main>
+          ) : (
+            <Routes>
+              <Route path="/" element={
+                <Home contract={contract} />
+              } />
+              <Route path="/my-tokens" element={
+                <MyTokens contract={contract} />
+              } />
+              <Route path="/my-resales" element={
+                <MyResales contract={contract} account={account} />
+              } />
+            </Routes>
+          )}
         </div>
       </div>
-    </div>
+    </BrowserRouter>
+
   );
 }
 
