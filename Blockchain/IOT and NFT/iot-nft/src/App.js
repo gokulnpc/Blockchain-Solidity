@@ -6,6 +6,7 @@ import Blog from './components/Blog';
 import Contact from './components/Contact';
 import Nopage from './components/Nopage';
 import Layout from './components/Layout';
+
 function App() {
   return (
     <BrowserRouter>
